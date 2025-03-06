@@ -11,31 +11,85 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  tasks     Task[]
-  projects  Project[]
+  id            String    @id
+  email         String    @unique
+  name          String?
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  tasks         Task[]
+  projects      Project[]
+  teamMembers   TeamMember[]
 }
 
 model Task {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String?
   status      String
   priority    Int
   dueDate     DateTime?
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
   projectId   Int?
-  project     Project? @relation(fields: [projectId], references: [id])
+  project     Project?  @relation(fields: [projectId], references: [id])
+  tags        TaskTag[]
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   tasks       Task[]
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  teamMembers TeamMember[]
+}
+
+model Team {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  members     TeamMember[]
+}
+
+model TeamMember {
+  id        Int      @id @default(autoincrement())
+  role      String   @default("member") // "owner", "admin", "member"
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  teamId    Int
+  team      Team     @relation(fields: [teamId], references: [id])
+  projectId Int?
+  project   Project? @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, teamId])
+  @@unique([userId, projectId])
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  color     String    @default("#3498db")
+  tasks     TaskTag[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model TaskTag {
+  taskId    Int
+  task      Task     @relation(fields: [taskId], references: [id])
+  tagId     Int
+  tag       Tag      @relation(fields: [tagId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@id([taskId, tagId])
 }

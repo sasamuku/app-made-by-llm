@@ -6,14 +6,19 @@
   --button-primary-hover: #383838;
   --button-secondary-hover: #f2f2f2;
 
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: center;
-  justify-items: center;
-  min-height: 100svh;
-  padding: 80px;
-  gap: 64px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family: var(--font-geist-sans);
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 18px;
+  color: var(--primary-color);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,85 +32,289 @@
   }
 }
 
-.main {
+.header {
+  background-color: var(--card-background);
+  padding: 16px 24px;
+  box-shadow: var(--shadow);
   display: flex;
-  flex-direction: column;
-  gap: 32px;
-  grid-row-start: 2;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.main ol {
-  font-family: var(--font-geist-mono);
-  padding-left: 0;
+.header h1 {
   margin: 0;
-  font-size: 14px;
-  line-height: 24px;
-  letter-spacing: -0.01em;
-  list-style-position: inside;
+  font-size: 24px;
+  color: var(--primary-color);
 }
 
-.main li:not(:last-of-type) {
-  margin-bottom: 8px;
-}
-
-.main code {
-  font-family: inherit;
-  background: var(--gray-alpha-100);
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-.ctas {
+.userInfo {
   display: flex;
+  align-items: center;
   gap: 16px;
 }
 
-.ctas a {
-  appearance: none;
-  border-radius: 128px;
-  height: 48px;
-  padding: 0 20px;
-  border: none;
-  border: 1px solid transparent;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
-  cursor: pointer;
+.signOutButton {
+  background-color: transparent;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+
+.signOutButton:hover {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.main {
+  flex: 1;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tabs {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tabButton {
+  background-color: transparent;
+  color: var(--light-text);
+  border: none;
+  padding: 12px 24px;
   font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-right: 8px;
 }
 
-a.primary {
-  background: var(--foreground);
-  color: var(--background);
-  gap: 8px;
+.tabButton:hover {
+  background-color: transparent;
+  color: var(--primary-color);
 }
 
-a.secondary {
-  border-color: var(--gray-alpha-200);
-  min-width: 180px;
+.activeTab {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.tabContent {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
 }
 
 .footer {
-  grid-row-start: 3;
+  background-color: var(--card-background);
+  padding: 16px 24px;
+  text-align: center;
+  color: var(--lighter-text);
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Auth Component Styles */
+.authContainer {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 32px;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.authForm {
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.switchAuthMode {
+  background-color: transparent;
+  color: var(--primary-color);
+  padding: 0;
+  font-size: 14px;
+}
+
+.switchAuthMode:hover {
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+/* Task Manager Styles */
+.taskManager, .projectManager {
+  display: flex;
+  flex-direction: column;
   gap: 24px;
 }
 
-.footer a {
+.taskForm, .projectForm {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+}
+
+.formActions {
+  display: flex;
   gap: 8px;
 }
 
-.footer img {
-  flex-shrink: 0;
+.cancelButton {
+  background-color: var(--light-text);
+}
+
+.cancelButton:hover {
+  background-color: var(--lighter-text);
+}
+
+.errorMessage {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--danger-color);
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 16px;
+  border-left: 4px solid var(--danger-color);
+}
+
+.message {
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 16px;
+  border-left: 4px solid;
+}
+
+.message.success {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.message.error {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.taskList, .projectList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.taskItem, .projectItem {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--primary-color);
+}
+
+.taskHeader, .projectHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.taskHeader h3, .projectHeader h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.taskActions, .projectActions {
+  display: flex;
+  gap: 8px;
+}
+
+.taskActions button, .projectActions button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.taskActions button:first-child, .projectActions button:first-child {
+  background-color: var(--secondary-color);
+}
+
+.taskActions button:first-child:hover, .projectActions button:first-child:hover {
+  background-color: var(--secondary-dark);
+}
+
+.taskActions button:last-child, .projectActions button:last-child {
+  background-color: var(--danger-color);
+}
+
+.taskActions button:last-child:hover, .projectActions button:last-child:hover {
+  background-color: var(--danger-dark);
+}
+
+.taskMeta, .projectMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.taskProject {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--primary-color);
+}
+
+.projectStats {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--light-text);
+}
+
+.projectDate {
+  font-size: 12px;
+  color: var(--lighter-text);
+  background-color: var(--background-color);
+  padding: 4px 8px;
+  border-radius: var(--border-radius);
+}
+
+.taskStatus, .taskPriority, .taskDueDate {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: var(--border-radius);
+  font-size: 12px;
+  background-color: var(--background-color);
+}
+
+.pending {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.in-progress {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.completed {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.priority-1 {
+  background-color: #e0e0e0;
+  color: var(--text-color);
+}
+
+.priority-2 {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.priority-3 {
+  background-color: var(--danger-color);
+  color: white;
 }
 
 /* Enable hover only on non-touch devices */

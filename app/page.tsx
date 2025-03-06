@@ -1,60 +1,79 @@
 "use client";
 import { useState, useEffect } from "react";
+// import { supabase } from "./lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 import styles from "./page.module.css";
+// import Auth from "./components/Auth";
+import TaskManager from "./components/TaskManager";
+import ProjectManager from "./components/ProjectManager";
 
 export default function Home() {
-interface Task {
-  id: number;
-  title: string;
-  status: string;
-}
+  // const [session, setSession] = useState<Session | null>(null);
+  const [activeTab, setActiveTab] = useState<'tasks' | 'projects'>('tasks');
 
-interface Project {
-  id: number;
-  name: string;
-}
+  // useEffect(() => {
+  //   // セッションの確認
+  //   supabase.auth.getSession().then(({ data: { session } }) => {
+  //     setSession(session);
+  //   });
 
-const [tasks, setTasks] = useState<Task[]>([]);
-const [projects, setProjects] = useState<Project[]>([]);
+  //   // 認証状態の変更を監視
+  //   const {
+  //     data: { subscription },
+  //   } = supabase.auth.onAuthStateChange((_event, session) => {
+  //     setSession(session);
+  //   });
 
-  useEffect(() => {
-    // Fetch tasks and projects from the API
-    async function fetchData() {
-      const tasksResponse = await fetch("/api/tasks");
-      const projectsResponse = await fetch("/api/projects");
-      const tasksData = await tasksResponse.json();
-      const projectsData = await projectsResponse.json();
-      setTasks(tasksData);
-      setProjects(projectsData);
-    }
-    fetchData();
-  }, []);
+  //   return () => subscription.unsubscribe();
+  // }, []);
+
+  // const handleSignOut = async () => {
+  //   await supabase.auth.signOut();
+  // };
+
+  // if (!session) {
+  //   return <Auth />;
+  // }
 
   return (
     <div className={styles.page}>
+      <header className={styles.header}>
+        <h1>SaaS タスク管理アプリケーション</h1>
+        <div className={styles.userInfo}>
+          <span>ユーザー</span>
+          {/* <button type="button" onClick={handleSignOut} className={styles.signOutButton}>
+            サインアウト
+          </button> */}
+        </div>
+      </header>
+
       <main className={styles.main}>
-        <h1>Task Management</h1>
-        <section>
-          <h2>Tasks</h2>
-          <ul>
-            {tasks.map((task) => (
-              <li key={task.id}>
-                {task.title} - {task.status}
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section>
-          <h2>Projects</h2>
-          <ul>
-            {projects.map((project) => (
-              <li key={project.id}>
-                {project.name}
-              </li>
-            ))}
-          </ul>
-        </section>
+        <div className={styles.tabs}>
+          <button
+            type="button"
+            className={`${styles.tabButton} ${activeTab === 'tasks' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('tasks')}
+          >
+            タスク
+          </button>
+          <button
+            type="button"
+            className={`${styles.tabButton} ${activeTab === 'projects' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('projects')}
+          >
+            プロジェクト
+          </button>
+        </div>
+
+        <div className={styles.tabContent}>
+          {activeTab === 'tasks' ? <TaskManager /> : <ProjectManager />}
+        </div>
       </main>
+
+      <footer className={styles.footer}>
+        <p>&copy; 2023 SaaS タスク管理アプリケーション</p>
+        <p>&copy; {new Date().getFullYear()} SaaS タスク管理アプリケーション</p>
+      </footer>
     </div>
   );
 }
