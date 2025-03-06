@@ -1,4 +1,4 @@
-# SaaS タスク管理アプリケーション
+# 人間が1行も書かないタスク管理アプリケーション
 
 これは[Next.js](https://nextjs.org)を使用した、[`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app)でブートストラップされたプロジェクトです。
 
