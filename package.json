@@ -6,7 +6,17 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:db:reset": "supabase db reset",
+    "supabase:migration:new": "supabase migration new",
+    "supabase:migration:up": "supabase migration up",
+    "supabase:studio": "supabase studio",
+    "supabase:types": "supabase gen types typescript --local > app/types/supabase.ts",
+    "supabase:pull": "supabase db pull",
+    "dev:with-supabase": "concurrently \"npm run supabase:start\" \"npm run dev\""
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
@@ -21,6 +31,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^8.2.2",
+    "supabase": "^1.142.2",
     "typescript": "^5"
   }
 }

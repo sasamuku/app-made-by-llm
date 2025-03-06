@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SaaS タスク管理アプリケーション
 
-## Getting Started
+これは[Next.js](https://nextjs.org)を使用した、[`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app)でブートストラップされたプロジェクトです。
 
-First, run the development server:
+## はじめに
+
+### Supabaseのセットアップ
+
+このプロジェクトは認証とデータベースサービスにSupabaseを使用しています。開発サーバーを起動する前に、ローカルのSupabaseサービスを起動する必要があります：
+
+```bash
+# Supabaseサービスを起動
+npm run supabase:start
+
+# その後、Next.js開発サーバーを起動
+npm run dev
+```
+
+または、両方を一度に起動するコマンドを使用することもできます：
+
+```bash
+npm run dev:with-supabase
+```
+
+利用可能なSupabaseコマンドの詳細については、[Supabaseコマンドドキュメント](./docs/supabase_commands.md)を参照してください。
+
+### 開発サーバー
+
+Next.js開発サーバーのみを実行するには：
 
 ```bash
 npm run dev
-# or
+# または
 yarn dev
-# or
+# または
 pnpm dev
-# or
+# または
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで[http://localhost:3000](http://localhost:3000)を開くと結果が表示されます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`app/page.tsx`を変更することでページの編集を開始できます。ファイルを編集すると、ページは自動的に更新されます。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+このプロジェクトは[`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)を使用して、Vercelの新しいフォントファミリーである[Geist](https://vercel.com/font)を自動的に最適化して読み込みます。
 
-## Learn More
+## プロジェクト構造
 
-To learn more about Next.js, take a look at the following resources:
+このプロジェクトは以下を使用するSaaSアプリケーションです：
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- フロントエンドに**Next.js（Appルーター）**
+- 認証とデータベースサービスに**Supabase**
+- データベーススキーマ管理とマイグレーションに**Prisma**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 主要ディレクトリ
 
-## Deploy on Vercel
+- `/app` - Next.jsアプリケーションコード
+  - `/app/components` - Reactコンポーネント
+  - `/app/lib` - ユーティリティ関数とライブラリ
+  - `/app/types` - TypeScript型定義
+- `/prisma` - Prismaスキーマとマイグレーション
+- `/supabase` - Supabase設定
+- `/docs` - プロジェクトドキュメント
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## データベース管理
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+このプロジェクトはデータベースサービスにSupabaseを、スキーマ管理にPrismaを使用しています：
+
+1. **Supabase**はPostgreSQLデータベースと認証サービスを提供
+2. **Prisma**はデータベーススキーマ定義とマイグレーションに使用
+
+データベースを変更する場合：
+
+1. `prisma/schema.prisma`でPrismaスキーマを更新
+2. `npm run supabase:migration:new`を使用してマイグレーションを作成
+3. `npm run supabase:migration:up`でマイグレーションを適用
+4. `npm run supabase:types`で更新されたTypeScript型を生成
+
+## 詳細情報
+
+Next.jsについて詳しく学ぶには、以下のリソースをご覧ください：
+
+- [Next.jsドキュメント](https://nextjs.org/docs) - Next.jsの機能とAPIについて学ぶ
+- [Learn Next.js](https://nextjs.org/learn) - インタラクティブなNext.jsチュートリアル
+
+[Next.jsのGitHubリポジトリ](https://github.com/vercel/next.js)もチェックできます - フィードバックと貢献を歓迎します！
+
+## Vercelへのデプロイ
+
+Next.jsアプリをデプロイする最も簡単な方法は、Next.jsの作成者によるプラットフォーム[Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)を使用することです。
+
+詳細については、[Next.jsデプロイドキュメント](https://nextjs.org/docs/app/building-your-application/deploying)をご覧ください。
