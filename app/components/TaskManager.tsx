@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useAuth } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 import styles from '../page.module.css';
 
 interface Task {
@@ -46,7 +47,20 @@ export default function TaskManager() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      // Supabaseからセッショントークンを取得
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('認証トークンがありません');
+      }
+
+      const response = await fetch('/api/projects', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
       if (response.ok) {
         const data = await response.json();
         setProjects(data);
@@ -63,7 +77,20 @@ export default function TaskManager() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/tasks');
+      // Supabaseからセッショントークンを取得
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('認証トークンがありません');
+      }
+
+      const response = await fetch('/api/tasks', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
@@ -93,6 +120,14 @@ export default function TaskManager() {
     try {
       setError(null);
 
+      // Supabaseからセッショントークンを取得
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('認証トークンがありません');
+      }
+
       const taskData = {
         ...newTask,
         projectId: newTask.projectId ? Number(newTask.projectId) : null,
@@ -102,6 +137,7 @@ export default function TaskManager() {
         method: editingTaskId ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(editingTaskId ? { id: editingTaskId, ...taskData } : taskData),
       });
@@ -146,8 +182,19 @@ export default function TaskManager() {
     try {
       setError(null);
 
+      // Supabaseからセッショントークンを取得
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('認証トークンがありません');
+      }
+
       const response = await fetch(`/api/tasks?id=${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       if (!response.ok) {

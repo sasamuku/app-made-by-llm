@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useAuth } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 import styles from '../page.module.css';
 
 interface Project {
@@ -37,7 +38,20 @@ export default function ProjectManager() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/projects');
+      // Supabaseからセッショントークンを取得
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('認証トークンがありません');
+      }
+
+      const response = await fetch('/api/projects', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
@@ -67,10 +81,19 @@ export default function ProjectManager() {
     try {
       setError(null);
 
+      // Supabaseからセッショントークンを取得
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('認証トークンがありません');
+      }
+
       const response = await fetch('/api/projects', {
         method: editingProjectId ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(editingProjectId ? { id: editingProjectId, ...newProject } : newProject),
       });
@@ -107,8 +130,19 @@ export default function ProjectManager() {
     try {
       setError(null);
 
+      // Supabaseからセッショントークンを取得
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('認証トークンがありません');
+      }
+
       const response = await fetch(`/api/projects?id=${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       if (!response.ok) {
