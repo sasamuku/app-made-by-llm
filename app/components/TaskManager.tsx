@@ -39,7 +39,7 @@ export default function TaskManager() {
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
-    status: 'pending',
+    status: 'TODO',
     priority: 1,
     dueDate: '',
     projectId: '' as string | '',
@@ -170,7 +170,7 @@ export default function TaskManager() {
       setNewTask({
         title: '',
         description: '',
-        status: 'pending',
+        status: 'TODO',
         priority: 1,
         dueDate: '',
         projectId: '',
@@ -304,9 +304,9 @@ export default function TaskManager() {
             value={newTask.status}
             onChange={handleInputChange}
           >
-            <option value="pending">未着手</option>
-            <option value="in-progress">進行中</option>
-            <option value="completed">完了</option>
+            <option value="TODO">未着手</option>
+            <option value="IN_PROGRESS">進行中</option>
+            <option value="DONE">完了</option>
           </select>
         </div>
         <div>
@@ -351,7 +351,7 @@ export default function TaskManager() {
                 setNewTask({
                   title: '',
                   description: '',
-                  status: 'pending',
+                  status: 'TODO',
                   priority: 1,
                   dueDate: '',
                   projectId: '',
@@ -394,8 +394,8 @@ export default function TaskManager() {
               )}
               <div className={styles.taskMeta}>
                 <span className={`${styles.taskStatus} ${styles[task.status]}`}>
-                  {task.status === 'pending' ? '未着手' :
-                   task.status === 'in-progress' ? '進行中' : '完了'}
+                  {task.status === 'TODO' ? '未着手' :
+                   task.status === 'IN_PROGRESS' ? '進行中' : '完了'}
                 </span>
                 <span className={`${styles.taskPriority} ${styles[`priority-${task.priority}`]}`}>
                   優先度: {task.priority === 1 ? '低' : task.priority === 2 ? '中' : '高'}
