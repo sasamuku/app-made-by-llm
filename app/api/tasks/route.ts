@@ -113,7 +113,15 @@ export async function POST(request: NextRequest) {
     // ユーザーをデータベースに同期
     await syncUserWithDatabase(userData.user);
 
-    const { title, description, status, priority, dueDate, projectId, tagIds } = await request.json();
+    const data = await request.json();
+    let { title, description, status, priority, dueDate, projectId, tagIds } = data;
+    if (status === "in-progress") {
+      status = "IN_PROGRESS";
+    } else if (status === "todo") {
+      status = "TODO";
+    } else if (status === "done") {
+      status = "DONE";
+    }
 
     // タスクを作成
     const task = await prisma.task.create({
@@ -162,7 +170,15 @@ export async function PUT(request: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const { id, title, description, status, priority, dueDate, projectId, tagIds } = await request.json();
+    const data = await request.json();
+    let { id, title, description, status, priority, dueDate, projectId, tagIds } = data;
+    if (status === "in-progress") {
+      status = "IN_PROGRESS";
+    } else if (status === "todo") {
+      status = "TODO";
+    } else if (status === "done") {
+      status = "DONE";
+    }
 
     // タスクの所有者を確認
     const existingTask = await prisma.task.findUnique({
