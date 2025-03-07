@@ -1,6 +1,7 @@
 # 人間が1行も書かないタスク管理アプリケーション
 
-これは[Next.js](https://nextjs.org)を使用した、[`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app)でブートストラップされたプロジェクトです。
+* 要件定義書も LLM が書き、コードも LLM が書く
+* 制約: 人間はプロンプトで起点を作るだけ
 
 ## はじめに
 
