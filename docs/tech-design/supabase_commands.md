@@ -92,7 +92,7 @@ npm run dev:with-supabase
    npm run supabase:types
    ```
 
-### Troubleshooting
+## Troubleshooting
 
 If you encounter issues with the local Supabase instance:
 
@@ -110,4 +110,3 @@ If you encounter issues with the local Supabase instance:
 3. If problems persist, reset the database:
    ```bash
    npm run supabase:db:reset
-   ```

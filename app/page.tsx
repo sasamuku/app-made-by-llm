@@ -6,10 +6,11 @@ import styles from "./page.module.css";
 import Auth from "./components/Auth";
 import TaskManager from "./components/TaskManager";
 import ProjectManager from "./components/ProjectManager";
+import TagManager from "./components/TagManager";
 
 export default function Home() {
   const [session, setSession] = useState<Session | null>(null);
-  const [activeTab, setActiveTab] = useState<'tasks' | 'projects'>('tasks');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'projects' | 'tags'>('tasks');
 
   useEffect(() => {
     // セッションの確認
@@ -38,7 +39,7 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1>SaaS タスク管理アプリケーション</h1>
+        <h1>タスク管理アプリケーション</h1>
         <div className={styles.userInfo}>
           <span>{session.user.email}</span>
           <button type="button" onClick={handleSignOut} className={styles.signOutButton}>
@@ -63,16 +64,24 @@ export default function Home() {
           >
             プロジェクト
           </button>
+          <button
+            type="button"
+            className={`${styles.tabButton} ${activeTab === 'tags' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('tags')}
+          >
+            タグ
+          </button>
         </div>
 
         <div className={styles.tabContent}>
-          {activeTab === 'tasks' ? <TaskManager /> : <ProjectManager />}
+          {activeTab === 'tasks' ? <TaskManager /> :
+           activeTab === 'projects' ? <ProjectManager /> :
+           <TagManager />}
         </div>
       </main>
 
       <footer className={styles.footer}>
-        <p>&copy; 2023 SaaS タスク管理アプリケーション</p>
-        <p>&copy; {new Date().getFullYear()} SaaS タスク管理アプリケーション</p>
+        <p>&copy; {new Date().getFullYear()} タスク管理アプリケーション</p>
       </footer>
     </div>
   );

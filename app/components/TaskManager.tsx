@@ -3,6 +3,15 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import styles from '../page.module.css';
+import TagBadge from './TagBadge';
+import TagSelector from './TagSelector';
+import TagFilter from './TagFilter';
+
+interface Tag {
+  id: number;
+  name: string;
+  color: string;
+}
 
 interface Task {
   id: number;
@@ -15,6 +24,7 @@ interface Task {
   projectId: number | null;
   createdAt: string;
   updatedAt: string;
+  tags?: Tag[];
 }
 
 interface Project {
@@ -32,11 +42,13 @@ export default function TaskManager() {
     status: 'pending',
     priority: 1,
     dueDate: '',
-    projectId: '' as string | ''
+    projectId: '' as string | '',
+    tagIds: [] as number[]
   });
   const [loading, setLoading] = useState(true);
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [filterTagIds, setFilterTagIds] = useState<number[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -85,7 +97,13 @@ export default function TaskManager() {
         throw new Error('認証トークンがありません');
       }
 
-      const response = await fetch('/api/tasks', {
+      // タグフィルターがある場合はクエリパラメータに追加
+      let url = '/api/tasks';
+      if (filterTagIds.length > 0) {
+        url += `?tags=${filterTagIds.join(',')}`;
+      }
+
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -155,7 +173,8 @@ export default function TaskManager() {
         status: 'pending',
         priority: 1,
         dueDate: '',
-        projectId: ''
+        projectId: '',
+        tagIds: []
       });
       setEditingTaskId(null);
     } catch (error) {
@@ -172,9 +191,31 @@ export default function TaskManager() {
       status: task.status,
       priority: task.priority,
       dueDate: task.dueDate || '',
-      projectId: task.projectId ? String(task.projectId) : ''
+      projectId: task.projectId ? String(task.projectId) : '',
+      tagIds: task.tags ? task.tags.map(tag => tag.id) : []
     });
   };
+
+  // タグの選択状態が変更されたときの処理
+  const handleTagChange = (tagIds: number[]) => {
+    setNewTask(prev => ({
+      ...prev,
+      tagIds
+    }));
+  };
+
+  // フィルタータグが変更されたときの処理
+  const handleFilterTagChange = (tagIds: number[]) => {
+    setFilterTagIds(tagIds);
+    fetchTasks();
+  };
+
+  // フィルタータグの変更を検知して再取得
+  useEffect(() => {
+    if (user) {
+      fetchTasks();
+    }
+  }, [filterTagIds, user]);
 
   const handleDelete = async (id: number) => {
     if (!confirm('このタスクを削除してもよろしいですか？')) return;
@@ -291,6 +332,13 @@ export default function TaskManager() {
             onChange={handleInputChange}
           />
         </div>
+        <div>
+          <label>タグ</label>
+          <TagSelector
+            selectedTagIds={newTask.tagIds}
+            onChange={handleTagChange}
+          />
+        </div>
         <div className={styles.formActions}>
           <button type="submit">
             {editingTaskId ? '更新' : '追加'}
@@ -306,7 +354,8 @@ export default function TaskManager() {
                   status: 'pending',
                   priority: 1,
                   dueDate: '',
-                  projectId: ''
+                  projectId: '',
+                  tagIds: []
                 });
               }}
               className={styles.cancelButton}
@@ -318,6 +367,10 @@ export default function TaskManager() {
       </form>
 
       <h2>タスク一覧</h2>
+      <TagFilter
+        selectedTagIds={filterTagIds}
+        onChange={handleFilterTagChange}
+      />
       {loading ? (
         <p>読み込み中...</p>
       ) : tasks.length === 0 ? (
@@ -353,6 +406,13 @@ export default function TaskManager() {
                   </span>
                 )}
               </div>
+              {task.tags && task.tags.length > 0 && (
+                <div className={styles.taskTags}>
+                  {task.tags.map(tag => (
+                    <TagBadge key={tag.id} tag={tag} />
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
