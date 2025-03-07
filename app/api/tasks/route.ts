@@ -35,11 +35,31 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // クエリパラメータからタグIDを取得
+    const { searchParams } = new URL(request.url);
+    const tagsParam = searchParams.get('tags');
+
+    // タスク検索条件
+    const where: any = {
+      userId: userId
+    };
+
+    // タグによるフィルタリング
+    if (tagsParam) {
+      const tagIds = tagsParam.split(',').map(id => Number(id));
+
+      where.tags = {
+        some: {
+          tagId: {
+            in: tagIds
+          }
+        }
+      };
+    }
+
     // ユーザーのタスクを取得
     const tasks = await prisma.task.findMany({
-      where: {
-        userId: userId
-      },
+      where,
       orderBy: [
         { priority: 'desc' },
         { dueDate: 'asc' }
@@ -50,11 +70,22 @@ export async function GET(request: NextRequest) {
             id: true,
             name: true
           }
+        },
+        tags: {
+          include: {
+            tag: true
+          }
         }
       }
     });
 
-    return NextResponse.json(tasks);
+    // レスポンス形式を整形
+    const formattedTasks = tasks.map(task => ({
+      ...task,
+      tags: task.tags.map(taskTag => taskTag.tag)
+    }));
+
+    return NextResponse.json(formattedTasks);
   } catch (error) {
     console.error('Error fetching tasks:', error);
     return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
@@ -82,7 +113,7 @@ export async function POST(request: NextRequest) {
     // ユーザーをデータベースに同期
     await syncUserWithDatabase(userData.user);
 
-    const { title, description, status, priority, dueDate, projectId } = await request.json();
+    const { title, description, status, priority, dueDate, projectId, tagIds } = await request.json();
 
     // タスクを作成
     const task = await prisma.task.create({
@@ -93,11 +124,30 @@ export async function POST(request: NextRequest) {
         priority,
         dueDate: dueDate ? new Date(dueDate) : null,
         userId,
-        projectId: projectId || null
+        projectId: projectId || null,
+        // タグの関連付け
+        tags: tagIds && tagIds.length > 0 ? {
+          create: tagIds.map((tagId: number) => ({
+            tagId: tagId
+          }))
+        } : undefined
+      },
+      include: {
+        tags: {
+          include: {
+            tag: true
+          }
+        }
       }
     });
 
-    return NextResponse.json(task, { status: 201 });
+    // レスポンス形式を整形
+    const formattedTask = {
+      ...task,
+      tags: task.tags.map(taskTag => taskTag.tag)
+    };
+
+    return NextResponse.json(formattedTask, { status: 201 });
   } catch (error) {
     console.error('Error creating task:', error);
     return NextResponse.json({ error: 'Failed to create task' }, { status: 500 });
@@ -112,7 +162,7 @@ export async function PUT(request: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const { id, title, description, status, priority, dueDate, projectId } = await request.json();
+    const { id, title, description, status, priority, dueDate, projectId, tagIds } = await request.json();
 
     // タスクの所有者を確認
     const existingTask = await prisma.task.findUnique({
@@ -123,20 +173,53 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized or task not found' }, { status: 403 });
     }
 
-    // タスクを更新
-    const task = await prisma.task.update({
-      where: { id: Number(id) },
-      data: {
-        title,
-        description,
-        status,
-        priority,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        projectId: projectId || null
+    // トランザクションを使用して、タスクの更新とタグの関連付けを一括で行う
+    const task = await prisma.$transaction(async (prisma) => {
+      // 既存のタグ関連付けを削除
+      if (tagIds !== undefined) {
+        await prisma.taskTag.deleteMany({
+          where: {
+            taskId: Number(id)
+          }
+        });
       }
+
+      // タスクを更新
+      const updatedTask = await prisma.task.update({
+        where: { id: Number(id) },
+        data: {
+          title,
+          description,
+          status,
+          priority,
+          dueDate: dueDate ? new Date(dueDate) : null,
+          projectId: projectId || null,
+          // 新しいタグの関連付け
+          tags: tagIds && tagIds.length > 0 ? {
+            create: tagIds.map((tagId: number) => ({
+              tagId: tagId
+            }))
+          } : undefined
+        },
+        include: {
+          tags: {
+            include: {
+              tag: true
+            }
+          }
+        }
+      });
+
+      return updatedTask;
     });
 
-    return NextResponse.json(task);
+    // レスポンス形式を整形
+    const formattedTask = {
+      ...task,
+      tags: task.tags.map(taskTag => taskTag.tag)
+    };
+
+    return NextResponse.json(formattedTask);
   } catch (error) {
     console.error('Error updating task:', error);
     return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SaaS タスク管理アプリケーション",
+  title: "タスク管理アプリケーション",
   description: "チームや個人がタスクを効率的に管理するためのSaaSアプリケーション",
 };
 

@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 import styles from '../page.module.css';
 import TagBadge from './TagBadge';
@@ -21,11 +20,10 @@ export default function TagFilter({ selectedTagIds, onChange }: TagFilterProps) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     fetchTags();
-  }, [pathname]);
+  }, []);
 
   const fetchTags = async () => {
     try {
