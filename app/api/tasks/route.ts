@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import prisma from '@/app/lib/prisma';
 import { syncUserWithDatabase } from '@/app/lib/server-auth';
+import { TaskStatus } from '@prisma/client';
 
 // Supabaseクライアントの作成
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -40,7 +41,16 @@ export async function GET(request: NextRequest) {
     const tagsParam = searchParams.get('tags');
 
     // タスク検索条件
-    const where: any = {
+    const where: {
+      userId: string;
+      tags?: {
+        some: {
+          tagId: {
+            in: number[];
+          };
+        };
+      };
+    } = {
       userId: userId
     };
 
@@ -124,29 +134,44 @@ export async function POST(request: NextRequest) {
     }
 
     // タスクを作成
-    const task = await prisma.task.create({
-      data: {
-        title,
-        description,
-        status,
-        priority,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        userId,
-        projectId: projectId || null,
-        // タグの関連付け
-        tags: tagIds && tagIds.length > 0 ? {
-          create: tagIds.map((tagId: number) => ({
-            tagId: tagId
-          }))
-        } : undefined
-      },
-      include: {
-        tags: {
-          include: {
-            tag: true
+    const task = await prisma.$transaction(async (tx) => {
+      // タスクを作成
+      const createdTask = await tx.task.create({
+        data: {
+          title,
+          description,
+          status,
+          priority,
+          dueDate: dueDate ? new Date(dueDate) : null,
+          userId,
+          projectId: projectId || null,
+          // タグの関連付け
+          tags: tagIds && tagIds.length > 0 ? {
+            create: tagIds.map((tagId: number) => ({
+              tagId: tagId
+            }))
+          } : undefined
+        },
+        include: {
+          tags: {
+            include: {
+              tag: true
+            }
           }
         }
-      }
+      });
+
+      // タスク作成の活動を記録
+      await tx.taskActivity.create({
+        data: {
+          taskId: createdTask.id,
+          userId,
+          action: 'created',
+          newStatus: status
+        }
+      });
+
+      return createdTask;
     });
 
     // レスポンス形式を整形
@@ -189,11 +214,15 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized or task not found' }, { status: 403 });
     }
 
+    // ステータスが変更されたかどうかを確認
+    const statusChanged = existingTask.status !== status;
+    const priorityChanged = existingTask.priority !== priority;
+
     // トランザクションを使用して、タスクの更新とタグの関連付けを一括で行う
-    const task = await prisma.$transaction(async (prisma) => {
+    const task = await prisma.$transaction(async (tx) => {
       // 既存のタグ関連付けを削除
       if (tagIds !== undefined) {
-        await prisma.taskTag.deleteMany({
+        await tx.taskTag.deleteMany({
           where: {
             taskId: Number(id)
           }
@@ -201,7 +230,7 @@ export async function PUT(request: NextRequest) {
       }
 
       // タスクを更新
-      const updatedTask = await prisma.task.update({
+      const updatedTask = await tx.task.update({
         where: { id: Number(id) },
         data: {
           title,
@@ -210,6 +239,10 @@ export async function PUT(request: NextRequest) {
           priority,
           dueDate: dueDate ? new Date(dueDate) : null,
           projectId: projectId || null,
+          // ステータスが完了に変更された場合、completedAtを設定
+          completedAt: status === 'DONE' && existingTask.status !== 'DONE' ? new Date() : existingTask.completedAt,
+          // ステータスが進行中に変更された場合、startedAtを設定（まだ設定されていない場合）
+          startedAt: status === 'IN_PROGRESS' && existingTask.status !== 'IN_PROGRESS' && !existingTask.startedAt ? new Date() : existingTask.startedAt,
           // 新しいタグの関連付け
           tags: tagIds && tagIds.length > 0 ? {
             create: tagIds.map((tagId: number) => ({
@@ -225,6 +258,21 @@ export async function PUT(request: NextRequest) {
           }
         }
       });
+
+      // タスク更新の活動を記録
+      if (statusChanged || priorityChanged) {
+        await tx.taskActivity.create({
+          data: {
+            taskId: Number(id),
+            userId,
+            action: 'status_changed',
+            oldStatus: statusChanged ? existingTask.status : undefined,
+            newStatus: statusChanged ? status : undefined,
+            oldPriority: priorityChanged ? existingTask.priority : undefined,
+            newPriority: priorityChanged ? priority : undefined
+          }
+        });
+      }
 
       return updatedTask;
     });
@@ -266,9 +314,22 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized or task not found' }, { status: 403 });
     }
 
-    // タスクを削除
-    await prisma.task.delete({
-      where: { id: Number(id) }
+    // トランザクションを使用して、タスクの削除と活動記録を一括で行う
+    await prisma.$transaction(async (tx) => {
+      // タスク削除の活動を記録
+      await tx.taskActivity.create({
+        data: {
+          taskId: Number(id),
+          userId,
+          action: 'deleted',
+          oldStatus: existingTask.status
+        }
+      });
+
+      // タスクを削除（関連するTaskTagとTaskActivityは自動的に削除される）
+      await tx.task.delete({
+        where: { id: Number(id) }
+      });
     });
 
     return new NextResponse(null, { status: 204 });

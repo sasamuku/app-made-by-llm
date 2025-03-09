@@ -26,6 +26,11 @@ model User {
   tasks         Task[]
   projects      Project[]
   teamMembers   TeamMember[]
+
+  // 分析機能関連
+  taskActivities      TaskActivity[]
+  productivityGoals   ProductivityGoal[]
+  analyticsPreference AnalyticsPreference?
 }
 
 model Task {
@@ -42,6 +47,13 @@ model Task {
   projectId   Int?
   project     Project?  @relation(fields: [projectId], references: [id])
   tags        TaskTag[]
+
+  // 分析機能関連
+  activities   TaskActivity[]
+  startedAt    DateTime?
+  completedAt  DateTime?
+  estimatedHours Float?
+  actualHours    Float?
 }
 
 model Project {
@@ -92,10 +104,59 @@ model Tag {
 
 model TaskTag {
   taskId    Int
-  task      Task     @relation(fields: [taskId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   tagId     Int
   tag       Tag      @relation(fields: [tagId], references: [id])
   createdAt DateTime @default(now())
 
   @@id([taskId, tagId])
+}
+
+// 分析機能関連のモデル
+model TaskActivity {
+  id          Int       @id @default(autoincrement())
+  taskId      Int
+  task        Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  action      String    // "created", "updated", "status_changed", "completed" など
+  oldStatus   String?
+  newStatus   String?
+  oldPriority Int?
+  newPriority Int?
+  timestamp   DateTime  @default(now())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([timestamp])
+}
+
+model ProductivityGoal {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  title       String
+  description String?
+  targetType  String    // "daily_tasks", "weekly_tasks", "completion_rate" など
+  targetValue Int
+  startDate   DateTime
+  endDate     DateTime?
+  achieved    Boolean   @default(false)
+  progress    Float     @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([startDate, endDate])
+}
+
+model AnalyticsPreference {
+  id                  Int      @id @default(autoincrement())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id])
+  dataCollectionEnabled Boolean @default(true)
+  defaultTimeRange    String   @default("week") // "day", "week", "month", "year"
+  dashboardLayout     Json?    // カスタムダッシュボードレイアウト設定
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
