@@ -106,11 +106,606 @@
 }
 
 .footer {
-  background-color: var(--card-background);
-  padding: 16px 24px;
+  margin-top: 2rem;
+  padding: 1rem;
   text-align: center;
-  color: var(--lighter-text);
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+  color: #666;
+  font-size: 0.8rem;
+}
+
+/* 分析ダッシュボード関連のスタイル */
+.analyticsDashboard {
+  width: 100%;
+  padding: 1rem;
+}
+
+.analyticsDashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.timeRangeSelector {
+  display: flex;
+  align-items: center;
+}
+
+.timeRangeSelectorButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.timeRangeButton {
+  padding: 0.5rem 1rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.activeTimeRange {
+  background-color: #007bff;
+  color: white;
+  border-color: #0069d9;
+}
+
+.metricCardsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.metricCard {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.metricCardPrimary {
+  border-top: 4px solid #007bff;
+}
+
+.metricCardSuccess {
+  border-top: 4px solid #28a745;
+}
+
+.metricCardWarning {
+  border-top: 4px solid #ffc107;
+}
+
+.metricCardDanger {
+  border-top: 4px solid #dc3545;
+}
+
+.metricCardInfo {
+  border-top: 4px solid #17a2b8;
+}
+
+.metricCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.metricCardTitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.metricCardIcon {
+  color: #999;
+}
+
+.metricCardBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.metricCardValue {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.metricCardChange {
+  font-size: 0.8rem;
+}
+
+.positive {
+  color: #28a745;
+}
+
+.negative {
+  color: #dc3545;
+}
+
+.analyticsChartsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.analyticsChartCard {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.analyticsChartCard h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.analyticsChart {
+  position: relative;
+  width: 100%;
+}
+
+.analyticsChartInfo {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.recentActivitiesContainer {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.recentActivitiesContainer h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.activityList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activityItem {
+  display: flex;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityTime {
+  width: 180px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.activityContent {
+  flex: 1;
+}
+
+.activityAction {
+  background-color: #f0f0f0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+.activityTask {
+  font-weight: 500;
+}
+
+.analyticsLinks {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.analyticsLinkButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.analyticsLinkButton:hover {
+  background-color: #0069d9;
+}
+
+.analyticsLoading,
+.analyticsError,
+.analyticsEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+}
+
+.analyticsError button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 戻るボタン */
+.backToDashboardButton {
+  background-color: transparent;
+  color: #007bff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.backToDashboardButton:hover {
+  text-decoration: underline;
+}
+
+/* 生産性分析関連のスタイル */
+.productivityAnalysis {
+  width: 100%;
+  padding: 1rem;
+}
+
+.analyticsControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.groupBySelector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.groupBySelect {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.averageCompletionTimeCard {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.averageCompletionTimeValue {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+  margin-top: 0.5rem;
+}
+
+.productivityTipsContainer {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.productivityTipsList {
+  padding-left: 1.5rem;
+}
+
+.productivityTipsList li {
+  margin-bottom: 0.75rem;
+}
+
+/* タスク予測関連のスタイル */
+.taskPrediction {
+  width: 100%;
+  padding: 1rem;
+}
+
+.recommendedTasksContainer,
+.workloadForecastContainer,
+.similarTasksContainer {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.recommendedTasksList,
+.similarTasksList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.recommendedTaskItem,
+.similarTaskItem {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #007bff;
+}
+
+.recommendedTaskHeader,
+.similarTaskHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.recommendedTaskHeader h4,
+.similarTaskHeader h4 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.recommendedTaskScore {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.highScore {
+  background-color: #28a745;
+  color: white;
+}
+
+.mediumScore {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.lowScore {
+  background-color: #dc3545;
+  color: white;
+}
+
+.recommendedTaskDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recommendedTaskDetail {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.recommendedTaskDetailLabel {
+  width: 100px;
+  color: #6c757d;
+}
+
+.highPriority {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.mediumPriority {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.lowPriority {
+  color: #28a745;
+}
+
+.similarTaskCompletionTime {
+  background-color: #f0f0f0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.similarTaskTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.similarTaskTag {
+  padding: 0.25rem 0.5rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  border: 1px solid;
+}
+
+.predictionTipsContainer {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.predictionTipsList {
+  padding-left: 1.5rem;
+}
+
+.predictionTipsList li {
+  margin-bottom: 0.75rem;
+}
+
+.emptyMessage {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+/* レポート生成関連のスタイル */
+.analyticsReports {
+  width: 100%;
+  padding: 1rem;
+}
+
+.reportFormContainer {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.reportForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formGroup h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.dateRangeInputs {
+  display: flex;
+  gap: 1rem;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dateInput,
+.selectInput {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.reportTypeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reportTypeOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.reportTypeOption:hover {
+  background-color: #f8f9fa;
+}
+
+.radioInput {
+  margin-top: 0.25rem;
+}
+
+.reportTypeLabel {
+  flex: 1;
+  cursor: pointer;
+}
+
+.reportTypeName {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.reportTypeDescription {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.formActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.generateReportButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.generateReportButton:hover {
+  background-color: #0069d9;
+}
+
+.generateReportButton:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.successMessage {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 1rem;
+  border-radius: 4px;
+  border-left: 4px solid #28a745;
+}
+
+.reportTipsContainer {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.reportTipsList {
+  padding-left: 1.5rem;
+}
+
+.reportTipsList li {
+  margin-bottom: 0.75rem;
 }
 
 /* Auth Component Styles */

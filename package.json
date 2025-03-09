@@ -22,9 +22,11 @@
     "@prisma/client": "^6.4.1",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.49.1",
+    "chart.js": "^4.4.8",
     "next": "15.2.1",
     "prisma": "^6.4.1",
     "react": "^19.0.0",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {

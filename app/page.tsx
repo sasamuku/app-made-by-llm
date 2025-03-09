@@ -7,10 +7,11 @@ import Auth from "./components/Auth";
 import TaskManager from "./components/TaskManager";
 import ProjectManager from "./components/ProjectManager";
 import TagManager from "./components/TagManager";
+import AnalyticsDashboard from "./components/AnalyticsDashboard";
 
 export default function Home() {
   const [session, setSession] = useState<Session | null>(null);
-  const [activeTab, setActiveTab] = useState<'tasks' | 'projects' | 'tags'>('tasks');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'projects' | 'tags' | 'analytics'>('tasks');
 
   useEffect(() => {
     // セッションの確認
@@ -71,12 +72,20 @@ export default function Home() {
           >
             タグ
           </button>
+          <button
+            type="button"
+            className={`${styles.tabButton} ${activeTab === 'analytics' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            分析
+          </button>
         </div>
 
         <div className={styles.tabContent}>
           {activeTab === 'tasks' ? <TaskManager /> :
            activeTab === 'projects' ? <ProjectManager /> :
-           <TagManager />}
+           activeTab === 'tags' ? <TagManager /> :
+           <AnalyticsDashboard />}
         </div>
       </main>
 
